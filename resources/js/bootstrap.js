@@ -1,3 +1,7 @@
+import 'alpinejs';
+
+import 'htmx.org';
+
 import axios from 'axios';
 window.axios = axios;
 

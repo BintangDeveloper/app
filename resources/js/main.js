@@ -1,4 +1,3 @@
 (function () {
-  //console.clear();
-  console.log('[DEBUG] Hello world!');
+  console.log(location.href.substring(location.href.lastIndexOf('/') + 1));
 })();

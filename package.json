@@ -6,6 +6,7 @@
         "build": "vite build"
     },
     "dependencies": {
+        "alpinejs": "^2.3.3",
         "htmx.org": "^1.9.12"
     },
     "devDependencies": {
