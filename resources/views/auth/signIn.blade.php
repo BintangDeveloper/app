@@ -9,7 +9,7 @@
         <meta name="description" content="Login to the dashboard">
         <title>Login</title>
 
-        @env(['local', 'production'])
+        @env(['production'])
           @vite('resources/css/app.css')
           @vite('resources/js/app.js')
         @endenv
@@ -35,12 +35,12 @@
                     @csrf
                     <label class="block">
                         <span class="text-gray-700 text-sm">Email</span>
-                        <input type="email" class="mt-1 block w-full rounded-md focus:border-indigo-600" name="email" aria-label="Email">
+                        <input type="email" class="mt-1 block w-full rounded-md focus:border-indigo-600" name="email" type="email" aria-label="Email">
                     </label>
 
                     <label class="block mt-3">
                         <span class="text-gray-700 text-sm">Password</span>
-                        <input type="password" class="mt-1 block w-full rounded-md focus:border-indigo-600" name="password" aria-label="Password">
+                        <input type="password" class="mt-1 block w-full rounded-md focus:border-indigo-600" name="password" type="password" aria-label="Password">
                     </label>
 
                     <div class="flex justify-between items-center mt-4">

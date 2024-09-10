@@ -12,6 +12,6 @@ export default {
     },
   },
   plugins: [
-    require('@tailwindcss/custom-forms')
+    require('@tailwindcss/forms')
   ],
 };
