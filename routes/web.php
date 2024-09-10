@@ -11,10 +11,10 @@ Route::get('/welcome', function () {
 });
 
 Route::group(['middleware' => 'guest'], function () {
-  Route::get('/_auth/register', [AuthController::class, 'register'])->name('register');
-  Route::post('/_auth/register', [AuthController::class, 'registerPost'])->name('register');
-  Route::get('/_auth/login', [AuthController::class, 'login'])->name('login');
-  Route::post('/_auth/login', [AuthController::class, 'loginPost'])->name('login');
+  Route::get('/auth/register', [AuthController::class, 'register'])->name('register');
+  Route::post('/auth/register', [AuthController::class, 'registerPost'])->name('register');
+  Route::get('/auth/login', [AuthController::class, 'login'])->name('login');
+  Route::post('/auth/login', [AuthController::class, 'loginPost'])->name('login');
 });
 Route::group(['middleware' => 'auth'], function () {
   Route::get('/home', [HomeController::class, 'index']);
