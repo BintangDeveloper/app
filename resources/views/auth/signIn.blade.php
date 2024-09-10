@@ -6,18 +6,13 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="referrer" content="always">
         
-
         <meta name="description" content="Login to the dashboard">
-
         <title>Login</title>
-        
-        @production
-          @vite('resources/css/app.css')
-        @endproduction
 
-        @production
+        @env(['local', 'production'])
+          @vite('resources/css/app.css')
           @vite('resources/js/app.js')
-        @endproduction
+        @endenv
     </head>
     <body>
         <div class="flex justify-center items-center h-screen bg-gray-200 px-6">
@@ -31,26 +26,27 @@
                 </div>
                 
                 @if(Session::has('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ Session::get('error') }}
-                        </div>
+                    <div class="alert alert-danger" role="alert">
+                        {{ Session::get('error') }}
+                    </div>
                 @endif
 
-                <form class="mt-4" action="{{ route('login') }}">
+                <form class="mt-4" action="{{ route('login') }}" method="POST">
+                    @csrf
                     <label class="block">
                         <span class="text-gray-700 text-sm">Email</span>
-                        <input type="email" class="form-input mt-1 block w-full rounded-md focus:border-indigo-600" name="email">
+                        <input type="email" class="mt-1 block w-full rounded-md focus:border-indigo-600" name="email" aria-label="Email">
                     </label>
 
                     <label class="block mt-3">
                         <span class="text-gray-700 text-sm">Password</span>
-                        <input type="password" class="form-input mt-1 block w-full rounded-md focus:border-indigo-600" name="password">
+                        <input type="password" class="mt-1 block w-full rounded-md focus:border-indigo-600" name="password" aria-label="Password">
                     </label>
 
                     <div class="flex justify-between items-center mt-4">
                         <div>
                             <label class="inline-flex items-center">
-                                <input type="checkbox" class="form-checkbox text-indigo-600">
+                                <input type="checkbox" class="form-checkbox text-indigo-600" name="remember">
                                 <span class="mx-2 text-gray-600 text-sm">Remember me</span>
                             </label>
                         </div>
@@ -61,7 +57,7 @@
                     </div>
 
                     <div class="mt-6">
-                        <button class="py-2 px-4 text-center bg-indigo-600 rounded-md w-full text-white text-sm hover:bg-indigo-500">
+                        <button type="submit" class="py-2 px-4 text-center bg-indigo-600 rounded-md w-full text-white text-sm hover:bg-indigo-500">
                             Sign in
                         </button>
                     </div>
