@@ -28,6 +28,7 @@
             <div x-cloak x-show="notificationOpen" @click="notificationOpen = false" class="fixed inset-0 z-10 w-full h-full"></div>
 
             <div x-cloak x-show="notificationOpen" class="absolute right-0 z-10 mt-2 overflow-hidden bg-white rounded-lg shadow-xl w-80" style="width:20rem;">
+              {{--
                 <a href="#" class="flex items-center px-4 py-3 -mx-2 text-gray-600 hover:text-white hover:bg-indigo-600">
                     <img class="object-cover w-8 h-8 mx-1 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80" alt="avatar">
                     <p class="mx-2 text-sm">
@@ -52,6 +53,7 @@
                         <span class="font-bold" href="#">Abigail Bennett</span> start following you . 3h
                     </p>
                 </a>
+                --}}
             </div>
         </div>
         
@@ -71,7 +73,7 @@
                 <form action="{{ route('logout') }}" method="POST" class="d-flex" role="search">
                 @csrf
                 @method('DELETE')
-                <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-600 hover:text-white" type="submit">Logout</button>
+                <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-600 hover:text-white w-full" type="submit">Logout</button>
                 </form>
             </div>
         </div>
