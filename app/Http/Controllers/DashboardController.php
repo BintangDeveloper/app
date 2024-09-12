@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index($uid)
+    public function index()
     {
         $userId = Auth::id();
 
