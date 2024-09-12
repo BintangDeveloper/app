@@ -24,7 +24,5 @@ Route::group(['middleware' => 'auth'], function () {
     AuthController::class, 'logout'
   ])->name('logout');
   
-  Route::get('/', [
-    HomeController::class, 'index'
-  ]);
+  Route::redirect('/', '/dashboard', 301);
 });

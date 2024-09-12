@@ -71,9 +71,9 @@
                 <a href="/login" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white">Logout</a>
                 --}}
                 <form action="{{ route('logout') }}" method="POST" class="d-flex" role="search">
-                @csrf
-                @method('DELETE')
-                <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-600 hover:text-white w-full" type="submit">Logout</button>
+                  @csrf
+                  @method('DELETE')
+                  <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-600 hover:text-white w-full" type="submit">Logout</button>
                 </form>
             </div>
         </div>
