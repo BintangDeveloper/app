@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
-
+use App\Http\Controllers\DashboardController;
 
 
 Route::get('/welcome', function () {
@@ -17,8 +17,13 @@ Route::group(['middleware' => 'guest'], function () {
   Route::post('/auth/login', [AuthController::class, 'loginPost'])->name('login');
 });
 Route::group(['middleware' => 'auth'], function () {
-  Route::get('/home', [HomeController::class, 'index']);
-  Route::delete('/logout', [AuthController::class, 'logout'])->name('logout');
+  Route::get('/dashboard/{uid}', [
+    DashboardController::class, 'index'
+  ]);
+  
+  Route::delete('/logout', [
+    AuthController::class, 'logout'
+  ])->name('logout');
   
   Route::get('/', function () {
     return view('dashboard.index');
