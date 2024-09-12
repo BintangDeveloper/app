@@ -39,9 +39,7 @@ class AuthController extends Controller
         ];
 
         if (Auth::attempt($credetials)) {
-            return redirect(
-              '/dashboard/' . md5(Auth::user()->id)
-            )->with('success', 'Login successful');
+            return redirect('/dashboard')->with('success', 'Login successful');
         }
 
         return back()->with('error', 'Email or Password is incorrect');
