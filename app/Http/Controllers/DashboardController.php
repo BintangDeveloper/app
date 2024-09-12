@@ -12,10 +12,6 @@ class DashboardController extends Controller
     {
         $userId = Auth::id();
 
-        if (md5($userId) !== $uid) {
-            abort(403, 'Forbidden');
-        }
-
-        return view('dashboard.index', ['id' => $uid]);
+        return view('dashboard.index');
     }
 }
