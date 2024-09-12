@@ -5,7 +5,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
 
-
 Route::get('/welcome', function () {
     return view('welcome');
 });
@@ -21,11 +20,11 @@ Route::group(['middleware' => 'auth'], function () {
     DashboardController::class, 'index'
   ]);
   
-  Route::delete('/logout', [
+  Route::delete('/auth/logout', [
     AuthController::class, 'logout'
   ])->name('logout');
   
-  Route::get('/', function () {
-    return view('dashboard.index');
-  });
+  Route::get('/', [
+    HomeController::class, 'index'
+  ]);
 });
