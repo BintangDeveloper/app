@@ -14,8 +14,16 @@ class MainMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle($request, Closure $next)
     {
-        return $next($request);
+        $response = $next($request);
+
+        if ($response->isSuccessful() && $response->headers->get('Content-Type') === 'text/html') {
+            $htmlMin = new HtmlMin();
+            $minifiedContent = $htmlMin->minify($response->getContent());
+            $response->setContent($minifiedContent);
+        }
+
+        return $response;
     }
 }
