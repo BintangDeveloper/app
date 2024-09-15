@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use voku\helper\HtmlMin;
 
 class MainMiddleware
 {
@@ -19,8 +18,18 @@ class MainMiddleware
         $response = $next($request);
 
         if ($response->isSuccessful() && $response->headers->get('Content-Type') === 'text/html') {
-            $htmlMin = new HtmlMin();
-            $minifiedContent = $htmlMin->minify($response->getContent());
+            // Remove unnecessary spaces, tabs, and newlines
+            $minifiedContent = preg_replace(
+                [
+                  '/>\s+</', 
+                  '/\s\s+/'
+                ],
+                [
+                  '><', 
+                  ' '
+                ],
+                $response->getContent()
+            );
             $response->setContent($minifiedContent);
         }
 
