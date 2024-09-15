@@ -6,6 +6,7 @@
             </svg>
         </button>
 
+        {{--
         <div class="relative mx-4 lg:mx-0">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                 <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none">
@@ -15,9 +16,11 @@
 
             <input class="w-32 pl-10 pr-4 rounded-md form-input sm:w-64 focus:border-indigo-600" type="text" placeholder="Search">
         </div>
+        --}}
     </div>
     
     <div class="flex items-center">
+        {{--
         <div x-data="{ notificationOpen: false }" class="relative">
             <button @click="notificationOpen = ! notificationOpen" class="flex mx-4 text-gray-600 focus:outline-none">
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -28,7 +31,6 @@
             <div x-cloak x-show="notificationOpen" @click="notificationOpen = false" class="fixed inset-0 z-10 w-full h-full"></div>
 
             <div x-cloak x-show="notificationOpen" class="absolute right-0 z-10 mt-2 overflow-hidden bg-white rounded-lg shadow-xl w-80" style="width:20rem;">
-              {{--
                 <a href="#" class="flex items-center px-4 py-3 -mx-2 text-gray-600 hover:text-white hover:bg-indigo-600">
                     <img class="object-cover w-8 h-8 mx-1 rounded-full" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80" alt="avatar">
                     <p class="mx-2 text-sm">
@@ -53,9 +55,9 @@
                         <span class="font-bold" href="#">Abigail Bennett</span> start following you . 3h
                     </p>
                 </a>
-                --}}
             </div>
         </div>
+        --}}
         
         <div x-data="{ dropdownOpen: false }"  class="relative">
             <button @click="dropdownOpen = ! dropdownOpen" class="relative block w-8 h-8 overflow-hidden rounded-full shadow focus:outline-none">
