@@ -10,10 +10,10 @@ Route::get('/welcome', function () {
 });
 
 Route::group(['middleware' => 'guest'], function () {
-  Route::get('/auth/register', [
+  Route::get('/auth/io/register', [
     AuthController::class, 'register'
   ])->name('register');
-  Route::post('/auth/register', [
+  Route::post('/auth/io/register', [
     AuthController::class, 'registerPost'
   ])->name('register');
   Route::get('/auth/login', [
