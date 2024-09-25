@@ -23,8 +23,8 @@
             <div class="flex-1 flex flex-col overflow-hidden">
                 @include('_layouts.header')
 
-                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
-                    <div class="container mx-auto px-6 py-8 text-white">
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 text-white">
+                    <div class="container mx-auto px-6 py-8">
                         @yield('body')
                     </div>
                 </main>

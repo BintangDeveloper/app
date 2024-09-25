@@ -1,7 +1,7 @@
 @extends('_layouts.master')
 
 @section('body')
-    <h3 class="text-gray-700 text-3xl font-medium">Dashboard</h3>
+    <h3 class="text-gray-200 text-3xl font-medium">Dashboard</h3>
     
     <div class="flex flex-col mt-8">
       {{ Auth::user() }}
