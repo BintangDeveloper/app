@@ -57,7 +57,7 @@
             <div class="flex justify-between items-center mt-4">
                 <div>
                     <label class="inline-flex items-center">
-                        <input type="checkbox" class="form-checkbox text-indigo-600" name="remember">
+                        <input type="checkbox" class="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-slate-800 checked:border-slate-800" name="remember">
                         <span class="mx-2 text-gray-300 text-sm">Remember me</span>
                     </label>
                 </div>
