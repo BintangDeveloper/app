@@ -17,18 +17,19 @@
         @endenv
     </head>
     <body>
-        <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-gray-900 font-roboto">
-            @include('_layouts.sidebar')
-            
-            <div class="flex-1 flex flex-col overflow-hidden">
-                @include('_layouts.header')
+<div x-data="{ sidebarOpen: false }" class="flex h-screen bg-gray-900 font-roboto">
+    @include('_layouts.sidebar')
 
-                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 text-white">
-                    <div class="container mx-auto px-6 py-8">
-                        @yield('body')
-                    </div>
-                </main>
+    <div class="flex-1 flex flex-col overflow-hidden">
+        @include('_layouts.header')
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-800 text-gray-200">
+            <div class="container mx-auto px-6 py-8">
+                @yield('body')
             </div>
-        </div>
+        </main>
+    </div>
+</div>
+
     </body>
 </html>
