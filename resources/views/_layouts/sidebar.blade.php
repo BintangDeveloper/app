@@ -45,5 +45,6 @@
 
             <span class="mx-3">Forms</span>
         </a>
+        {{ request() }}
     </nav>
 </div>
