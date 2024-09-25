@@ -322,5 +322,4 @@
         </div>
     </div>
     --}}
-            {{ request() }}
 @endsection
