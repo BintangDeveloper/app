@@ -61,7 +61,7 @@
         
         <div x-data="{ dropdownOpen: false }"  class="relative">
             <button @click="dropdownOpen = ! dropdownOpen" class="relative block w-8 h-8 overflow-hidden rounded-full shadow focus:outline-none">
-                <img class="object-cover w-full h-full" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4hbqviczx51KEB8KoUKEMENPq2qVr_hkKprTU2GlrZ5mFoK4k6zXc4ipd&s=10" alt="Your avatar">
+                <img class="object-cover w-full h-full" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReFKv45Won-yR3av11DJ_vistY25Hxa87DNxRNZxMNdD9ynsBqsuBAlk2M&s=10" alt="Your avatar">
             </button>
 
             <div x-cloak x-show="dropdownOpen" @click="dropdownOpen = false" class="fixed inset-0 z-10 w-full h-full"></div>
