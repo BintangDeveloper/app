@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 
-Route::post('/csp-violation-report', function (Request $request) {
+Route::post('/csp', function (Request $request) {
     $report = $request->all();
     
     // Format the message to be sent to Discord
