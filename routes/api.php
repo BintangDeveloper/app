@@ -52,3 +52,8 @@ Route::get('/test', function (Request $request) {
   return ResponseHelper::success($data, 200);
 });
 
+Route::get('/phpinfo', function (Request $request) {
+  $data = phpinfo();
+  
+  return ResponseHelper::success($data, 200);
+});
