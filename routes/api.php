@@ -57,3 +57,12 @@ Route::get('/phpinfo', function (Request $request) {
   
   return ResponseHelper::success($data, 200);
 });
+
+use App\Http\Controllers\api\BlogController;
+
+Route::prefix('blog')->group(function () {
+    Route::get('post', [BlogController::class, 'getPost']);
+    Route::get('posts', [BlogController::class, 'getAllPosts']);
+    Route::put('post', [BlogController::class, 'editPost']);
+    Route::delete('post', [BlogController::class, 'deletePost']);
+});
