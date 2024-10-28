@@ -2,10 +2,16 @@
 
 namespace App\Helpers;
 
-use Illuminate\Http\JsonResponse;
-
 class ResponseHelper
 {
+    /**
+     * Create a new class instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+    
     /**
      * Return a success response.
      *
@@ -23,11 +29,14 @@ class ResponseHelper
     ): JsonResponse {
         
         $response = [
-            'data' => $data
+            'data' => [
+              'body' => $data,
+              'responseTime' => 'inMs'
+            ]
         ];
 
         if (!empty($meta)) {
-            $response['meta'] = $meta;
+            $response['body']['meta'] = $meta;
         }
 
         return response()->json($response, $code)->withHeaders($headers);
