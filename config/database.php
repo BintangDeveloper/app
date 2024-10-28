@@ -30,6 +30,12 @@ return [
     */
 
     'connections' => [
+      
+        'mongodb' => [
+          'driver' => 'mongodb',
+          'dsn' => env('DB_URL'),
+          'database' => env('DB_DATABASE'),
+        ],
 
         'sqlite' => [
             'driver' => 'sqlite',
