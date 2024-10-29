@@ -30,12 +30,6 @@ return [
     */
 
     'connections' => [
-      
-        'mongodb' => [
-          'driver' => 'mongodb',
-          'dsn' => env('DB_URL'),
-          'database' => env('DB_DATABASE'),
-        ],
 
         'sqlite' => [
             'driver' => 'sqlite',
@@ -47,7 +41,7 @@ return [
             'journal_mode' => null,
             'synchronous' => null,
         ],
-
+        
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
