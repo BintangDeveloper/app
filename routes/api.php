@@ -17,10 +17,4 @@ Route::prefix('test')->group(function () {
   Route::get('/ping', function (Request $request) {
     return ResponseHelper::success("Hello World!");
   });
-  
-  Route::get('/appwrite', function (Request $request) {
-    return ResponseHelper::error(
-      json_encode(App\AppwriteClient::getClient()), [], 503
-    );
-  });
 });
