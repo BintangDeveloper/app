@@ -38,4 +38,23 @@ class AppwriteClient
 
         return self::$client;
     }
+    
+    /**
+     * Get an instance of the specified Appwrite service.
+     *
+     * @param string $serviceName
+     * @return mixed
+     * @throws \Exception if the service class does not exist
+     */
+    public static function getService(
+      string $serviceName
+    ) {
+        $serviceClass = "Appwrite\\Services\\$serviceName";
+        
+        if (!class_exists($serviceClass)) {
+            throw new \Exception("Service class $serviceClass does not exist.");
+        }
+        
+        return new $serviceClass(self::getClient());
+    }
 }

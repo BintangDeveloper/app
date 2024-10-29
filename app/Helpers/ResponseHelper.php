@@ -7,11 +7,20 @@ use Illuminate\Http\JsonResponse;
 class ResponseHelper
 {
     /**
-     * Create a new class instance.
+     * Enable JSON pretty print.
+     *
+     * @var bool
      */
-    public function __construct()
+    private static bool $prettyPrint = false;
+
+    /**
+     * Constructor to set pretty print.
+     *
+     * @param bool $prettyPrint
+     */
+    public function __construct(bool $prettyPrint = false)
     {
-        //
+        self::$prettyPrint = $prettyPrint;
     }
 
     /**
@@ -27,14 +36,20 @@ class ResponseHelper
         array $meta = [], 
         bool $isError = false
     ): array {
-        $responseTime = round((microtime(true) - LARAVEL_START) * 1000); // Calculate response time in ms
+        $responseTime = round((microtime(true) - LARAVEL_START) * 1000);
+
         $response = [
+            'status' => $isError ? 'error' : 'success',
             'responseTime' => "{$responseTime}ms",
             $isError ? 'error' : 'data' => $data,
         ];
 
         if (!empty($meta)) {
-            $response[$isError ? 'error' : 'meta'] = $meta;
+            if ($isError) {
+                $response['error']['details'] = $meta;
+            } else {
+                $response['meta'] = $meta;
+            }
         }
 
         return $response;
@@ -55,8 +70,7 @@ class ResponseHelper
         array $meta = [], 
         array $headers = []
     ): JsonResponse {
-        $response = self::buildResponse(['body' => $data], $meta);
-        return response()->json($response, $code)->withHeaders($headers);
+        return self::jsonResponse($data, $meta, $code, $headers);
     }
 
     /**
@@ -74,12 +88,8 @@ class ResponseHelper
         int $code = 500, 
         array $headers = []
     ): JsonResponse {
-        $response = self::buildResponse(
-            ['code' => $code, 'message' => $message], 
-            $details, 
-            isError: true
-        );
-        return response()->json($response, $code)->withHeaders($headers);
+        $data = ['code' => $code, 'message' => $message];
+        return self::jsonResponse($data, $details, $code, $headers, true);
     }
 
     /**
@@ -97,7 +107,29 @@ class ResponseHelper
         array $meta = [], 
         array $headers = []
     ): JsonResponse {
-        $response = self::buildResponse($data, $meta);
-        return response()->json($response, $code)->withHeaders($headers);
+        return self::success($data, $code, $meta, $headers);
+    }
+
+    /**
+     * Generate a JSON response.
+     *
+     * @param mixed $data
+     * @param array $meta
+     * @param int $code
+     * @param array $headers
+     * @param bool $isError
+     * @return JsonResponse
+     */
+    private static function jsonResponse(
+        mixed $data, 
+        array $meta, 
+        int $code, 
+        array $headers, 
+        bool $isError = false
+    ): JsonResponse {
+        $response = self::buildResponse($data, $meta, $isError);
+        $jsonOptions = self::$prettyPrint ? JSON_PRETTY_PRINT : 0;
+
+        return response()->json($response, $code, [], $jsonOptions)->withHeaders($headers);
     }
 }
