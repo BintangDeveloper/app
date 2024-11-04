@@ -14,12 +14,16 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('database')->group(function () {
-  
+
 });
 
-Route::prefix('storage')->group(function () {
-  
-}); 
+Route::prefix('storage')
+  ->controller(StorageController::class)
+  ->group(function () {
+    
+    Route::get('/{BUCKET_ID}/get/{FILE_ID}', 'get');
+    Route::post('/{BUCKET_ID}/upload', 'upload');
+});
 
 Route::prefix('test')->group(function () {
   

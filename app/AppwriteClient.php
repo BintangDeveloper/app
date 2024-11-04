@@ -3,6 +3,7 @@
 namespace App;
 
 use Appwrite\Client;
+use Appwrite\Service;
 
 class AppwriteClient
 {
@@ -25,21 +26,24 @@ class AppwriteClient
     public static function getClient(
         string $endpoint = null, 
         string $project = null, 
-        string $secret = null
+        string $secret = null,
+        bool $selfSigned = false 
     ): Client {
-        // Ensure the Appwrite\Client class is available
+      
         if (!class_exists(Client::class)) {
             throw new \Exception("Appwrite Client class is required but not found. Please ensure the Appwrite SDK is installed.");
         }
 
-        // Initialize the client only if it has not been created yet
         if (is_null(self::$client)) {
             self::$client = new Client();
             self::$client
-                ->setEndpoint($endpoint ?? env('APPWRITE_ENDPOINT'))
-                ->setProject($project ?? env('APPWRITE_PROJECTID'))
-                ->setKey($secret ?? env('APPWRITE_SECRET'))
-                ->setSelfSigned();
+                ->setEndpoint($endpoint ?? env('APPWRITE_ENDPOINT', 'https://cloud.appwrite.io/v1'))
+                ->setProject($project ?? env('APPWRITE_PROJECTID', 'XXXXXXXXXXXXXXXXXXX'))
+                ->setKey($secret ?? env('APPWRITE_SECRET', 'standard_XXXXXXXXXX'));
+
+            if (env('APPWRITE_SELF_SIGNED', false) || $selfSigned) {
+                self::$client->setSelfSigned();
+            }
         }
 
         return self::$client;
@@ -49,15 +53,15 @@ class AppwriteClient
      * Get an instance of the specified Appwrite service.
      *
      * @param string $serviceName
-     * @return mixed
+     * @return Service
      * @throws \Exception if the service class does not exist
      */
     public static function getService(
-        string $serviceName
-    ) {
+      string $serviceName
+    ): Service {
+      
         $serviceClass = "Appwrite\\Services\\$serviceName";
 
-        // Ensure the specified service class is available
         if (!class_exists($serviceClass)) {
             throw new \Exception("Appwrite service class '$serviceClass' does not exist. Please check the service name.");
         }
