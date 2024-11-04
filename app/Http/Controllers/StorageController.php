@@ -11,7 +11,7 @@ class StorageController extends Controller
 {
     protected $storage;
 
-    public function __construct(): void
+    public function __construct()
     {
         $this->storage = AppwriteClient::getService('Storage');
     }
