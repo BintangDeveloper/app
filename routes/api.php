@@ -24,7 +24,15 @@ Route::prefix('storage')
   ->group(function () {
     
     Route::get(
-      '/{BUCKET_ID}/info/{FILE_ID}', 'getInfo'
+      '/{BUCKET_ID}/info/{FILE_ID}', 'getFileInfo'
+    );
+    
+    Route::get(
+      '/{BUCKET_ID}/download/{FILE_ID}', 'getFileDownload'
+    );
+    
+    Route::post(
+      '/{BUCKET_ID}/upload', 'uploadFile'
     );
 });
 

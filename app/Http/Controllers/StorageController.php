@@ -16,7 +16,7 @@ class StorageController extends Controller
         $this->storage = AppwriteClient::getService('Storage');
     }
 
-    public function getInfo($BUCKET_ID, $FILE_ID)
+    public function getFileInfo($BUCKET_ID, $FILE_ID)
     {
         try {
             $file = $this->storage->getFile(
@@ -29,8 +29,16 @@ class StorageController extends Controller
             return ResponseHelper::error($e->getMessage());
         }
     }
+    
+    public function getFileDownload($BUCKET_ID, $FILE_ID)
+    {
+      ResponseHelper::success($this->storage->getFileDownload(
+        bucketId: $BUCKET_ID,
+        fileId: $FILE_ID
+      ));
+    }
 
-    public function upload(Request $request, $BUCKET_ID)
+    public function uploadFile(Request $request, $BUCKET_ID)
     {
         // Ensure a file is provided
         if (!$request->hasFile('file')) {
@@ -63,4 +71,5 @@ class StorageController extends Controller
             return ResponseHelper::error($e->getMessage());
         }
     }
+    
 }
