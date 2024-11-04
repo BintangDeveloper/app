@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AppwriteClient;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Exception;
 
 class StorageController extends Controller
@@ -16,7 +17,7 @@ class StorageController extends Controller
         $this->storage = AppwriteClient::getService('Storage');
     }
 
-    public function getFileInfo($BUCKET_ID, $FILE_ID)
+    public function getFileInfo($BUCKET_ID, $FILE_ID): JsonResponse
     {
         try {
             $file = $this->storage->getFile(
@@ -30,20 +31,27 @@ class StorageController extends Controller
         }
     }
     
-    public function getFileDownload($BUCKET_ID, $FILE_ID)
+    public function getFileDownload($BUCKET_ID, $FILE_ID): JsonResponse
     {
-      ResponseHelper::success($this->storage->getFileDownload(
-        bucketId: $BUCKET_ID,
-        fileId: $FILE_ID
-      ));
+        try {
+            $result = $this->storage->getFileDownload(
+                bucketId: $BUCKET_ID,
+                fileId: $FILE_ID
+            );
+
+            return ResponseHelper::success($result);
+        } catch (Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
     }
 
-    public function uploadFile(Request $request, $BUCKET_ID)
+    public function uploadFile(Request $request, $BUCKET_ID): JsonResponse
     {
         // Ensure a file is provided
-        if (!$request->hasFile('file')) {
-            return ResponseHelper::error('Require input "file" as file buffer.');
-        }
+        $request->validate([
+            'file' => 'required|file|mimes:jpg,jpeg,png,gif,webp,mp4,mov,avi,mp3,wav,flac|max:51200' // max size is 50MB (51200 KB)
+        ]);
+
 
         $file = $request->file('file');
         $originalName = $file->getClientOriginalName();
@@ -51,9 +59,8 @@ class StorageController extends Controller
 
         try {
             // Generate a unique file ID using a hash
-            $fileId = hash('sha128', uniqid('', true));
+            $fileId = hash('sha1', uniqid('', true));
 
-            // Manually create a format compatible with Appwrite's file upload
             $inputFile = [
                 'file' => $fileContent,
                 'filename' => $originalName
@@ -71,5 +78,4 @@ class StorageController extends Controller
             return ResponseHelper::error($e->getMessage());
         }
     }
-    
 }
