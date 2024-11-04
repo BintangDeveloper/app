@@ -23,8 +23,9 @@ Route::prefix('storage')
   ->controller(StorageController::class)
   ->group(function () {
     
-    Route::get('/{BUCKET_ID}/get/{FILE_ID}', 'get');
-    Route::post('/{BUCKET_ID}/upload', 'upload');
+    Route::get(
+      '/{BUCKET_ID}/info/{FILE_ID}', 'getInfo'
+    );
 });
 
 Route::prefix('test')->group(function () {

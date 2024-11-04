@@ -11,14 +11,14 @@ class ResponseHelper
      *
      * @var bool
      */
-    private static bool $prettyPrint = false;
+    private static bool $prettyPrint = true;
 
     /**
      * Constructor to set pretty print.
      *
      * @param bool $prettyPrint
      */
-    public function __construct(bool $prettyPrint = false)
+    public function __construct(bool $prettyPrint = true)
     {
         self::$prettyPrint = $prettyPrint;
     }
