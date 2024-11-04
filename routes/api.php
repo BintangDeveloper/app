@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Helpers\ResponseHelper;
 
+use App\Http\Controllers\StorageController;
+
 Route::prefix('auth')->group(function () {
   
   Route::get('/user', function (Request $request) {
