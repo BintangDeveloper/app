@@ -53,7 +53,7 @@ class StorageController extends Controller
     
     public function getFilePreview($BUCKET_ID, $FILE_ID)
     {
-      $result = $storage->getFilePreview(
+      $result = $this->storage->getFilePreview(
         bucketId: $BUCKET_ID,
         fileId: $FILE_ID
       );
@@ -62,7 +62,7 @@ class StorageController extends Controller
     
     public function getFileView($BUCKET_ID, $FILE_ID)
     {
-      $result = $storage->getFileView(
+      $result = $this->storage->getFileView(
         bucketId: $BUCKET_ID,
         fileId: $FILE_ID
       );

@@ -41,8 +41,8 @@ class ResponseHelper
         $response = [
             'status' => $isError ? 'error' : 'success',
             'responseTime' => "{$responseTime}ms",
-            'timestamp' => date("Y-m-d H:i:s"),
             $isError ? 'error' : 'data' => $data,
+            'timestamp' => date("Y-m-d H:i:s"),
         ];
 
         if (!empty($meta)) {
