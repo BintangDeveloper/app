@@ -15,5 +15,20 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Set when to render as JSON
+        $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
+
+        // Customize the JSON response format
+        $exceptions->renderUsing(function (Request $request, Throwable $e): Response {
+            $status = $e instanceof HttpException ? $e->getStatusCode() : 500;
+            $message = $e->getMessage() ?: 'An unexpected error occurred';
+
+            return new JsonResponse([
+                'error' => true,
+                'status' => $status,
+                'message' => $message,
+            ], $status);
+        });
     })->create();
