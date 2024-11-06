@@ -6,7 +6,8 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use App\Helpers\ResponseHelper;
-
+use Symfony\Component\HttpFoundation\Response;
+ 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -18,9 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-    $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-        if ($request->is('api/*')) {
-            return ResponseHelper::error('Record not found.');
+    $exceptions->respond(function (Response $response) {
+        if ($response->getStatusCode() === 404) {
+            return ResponseHelper::error('The page is invalid, please try again.',
+            );
         }
+ 
+        return $response;
       });
     })->create();
