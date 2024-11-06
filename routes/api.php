@@ -24,6 +24,10 @@ Route::prefix('storage')
   ->group(function () {
     
     Route::get(
+      '/{BUCKET_ID}/list', 'listFiles'
+    );
+    
+    Route::get(
       '/{BUCKET_ID}/info/{FILE_ID}', 'getFileInfo'
     );
     

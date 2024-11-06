@@ -16,82 +16,71 @@ class StorageController extends Controller
     {
         $this->storage = AppwriteClient::getService('Storage');
     }
-
-    public function getFileInfo($BUCKET_ID, $FILE_ID): JsonResponse
-    {
-        try {
-            $file = $this->storage->getFile(
-                bucketId: $BUCKET_ID,
-                fileId: $FILE_ID
-            );
-
-            return ResponseHelper::success($file);
-        } catch (Exception $e) {
-            return ResponseHelper::error($e->getMessage(), [
-              'BUCKET_ID' => $BUCKET_ID, 
-              'FILE_ID' => $FILE_ID
-            ]);
-        }
-    }
     
-    public function getFileDownload($BUCKET_ID, $FILE_ID): JsonResponse
+    public function listFiles(string $bucketId): JsonResponse
     {
         try {
-            $result = $this->storage->getFileDownload(
-                bucketId: $BUCKET_ID,
-                fileId: $FILE_ID
-            );
-
+            $result = $this->storage->listFiles(bucketId: $bucketId);
             return ResponseHelper::success($result);
         } catch (Exception $e) {
-            return ResponseHelper::error($e->getMessage(), [
-              'BUCKET_ID' => $BUCKET_ID, 
-              'FILE_ID' => $FILE_ID
-            ]);
+            return ResponseHelper::error("Failed to list files.", ['bucketId' => $bucketId, 'error' => $e->getMessage()]);
+        }
+    }
+
+    public function getFileInfo(string $bucketId, string $fileId): JsonResponse
+    {
+        try {
+            $file = $this->storage->getFile(bucketId: $bucketId, fileId: $fileId);
+            return ResponseHelper::success($file);
+        } catch (Exception $e) {
+            return ResponseHelper::error("File not found.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
         }
     }
     
-    public function getFilePreview($BUCKET_ID, $FILE_ID)
+    public function getFileDownload(string $bucketId, string $fileId): JsonResponse
     {
-      $result = $this->storage->getFilePreview(
-        bucketId: $BUCKET_ID,
-        fileId: $FILE_ID
-      );
-      return ResponseHelper::success($result);
+        try {
+            $result = $this->storage->getFileDownload(bucketId: $bucketId, fileId: $fileId);
+            return ResponseHelper::success($result);
+        } catch (Exception $e) {
+            return ResponseHelper::error("Failed to download file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
+        }
     }
     
-    public function getFileView($BUCKET_ID, $FILE_ID)
+    public function getFilePreview(string $bucketId, string $fileId): JsonResponse
     {
-      $result = $this->storage->getFileView(
-        bucketId: $BUCKET_ID,
-        fileId: $FILE_ID
-      );
-      return ResponseHelper::success($result);
+        try {
+            $result = $this->storage->getFilePreview(bucketId: $bucketId, fileId: $fileId);
+            return ResponseHelper::success($result);
+        } catch (Exception $e) {
+            return ResponseHelper::error("Failed to preview file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
+        }
+    }
+    
+    public function getFileView(string $bucketId, string $fileId): JsonResponse
+    {
+        try {
+            $result = $this->storage->getFileView(bucketId: $bucketId, fileId: $fileId);
+            return ResponseHelper::success($result);
+        } catch (Exception $e) {
+            return ResponseHelper::error("Failed to view file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
+        }
     }
 
-    public function uploadFile(Request $request, $BUCKET_ID): JsonResponse
+    public function uploadFile(Request $request, string $bucketId): JsonResponse
     {
-        // Ensure a file is provided
-        $request->validate([
-            'file' => 'required|file|mimes:jpg,jpeg,png,gif,webp,mp4,mov,avi,mp3,wav,flac|max:51200' // max size is 50MB (51200 KB)
-        ]);
-
-
-        $file = $request->file('file');
-        $originalName = $file->getClientOriginalName();
-        $fileContent = file_get_contents($file->getRealPath());
+        $this->validateFile($request);
 
         try {
-            // Generate a unique file ID using a hash
-            $fileId = hash('sha1', uniqid('', true));
+            $file = $request->file('file');
+            $fileId = $this->generateFileId();
+            $fileContent = file_get_contents($file->getRealPath());
+            $fileName = $file->getClientOriginalName();
 
-            $inputFile = [
-                'file' => $fileContent,
-                'filename' => $originalName
-            ];
+            $inputFile = ['file' => $fileContent, 'filename' => $fileName];
 
             $uploadedFile = $this->storage->createFile(
-                bucketId: $BUCKET_ID,
+                bucketId: $bucketId,
                 fileId: $fileId,
                 file: $inputFile,
                 permissions: ['read("any")']
@@ -99,10 +88,24 @@ class StorageController extends Controller
 
             return ResponseHelper::success($uploadedFile);
         } catch (Exception $e) {
-            return ResponseHelper::error($e->getMessage(), [
-              'BUCKET_ID' => $BUCKET_ID,
-              'REQUEST' => $request
-            ]);
+            return ResponseHelper::error("File upload failed.", ['bucketId' => $bucketId, 'error' => $e->getMessage()]);
         }
+    }
+
+    protected function validateFile(Request $request): void
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:jpg,jpeg,png,gif,webp,mp4,mov,avi,mp3,wav,flac|max:51200'
+        ], [
+            'file.required' => 'Please provide a file to upload.',
+            'file.file' => 'The uploaded item must be a file.',
+            'file.mimes' => 'Invalid file format.',
+            'file.max' => 'File size cannot exceed 50MB.'
+        ]);
+    }
+
+    protected function generateFileId(): string
+    {
+        return hash('sha1', uniqid('', true));
     }
 }
