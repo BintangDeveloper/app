@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
     $exceptions->respond(function (Response $response) {
         if ($response->getStatusCode() === 404) {
-            return ResponseHelper::error('The api route is found.', [$exceptions], 404);
+            return ResponseHelper::error('The api route is found.', [], 404);
         }
  
         return $response;
