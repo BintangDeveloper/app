@@ -40,7 +40,7 @@ class ResponseHelper
 
         $response = [
             'status' => $isError ? 'error' : 'success',
-            'responseTime' => "{$responseTime}ms",
+            'responseTime' => "{$responseTime}",
             $isError ? 'error' : 'data' => $data,
         ];
 

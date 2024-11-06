@@ -27,7 +27,10 @@ class StorageController extends Controller
 
             return ResponseHelper::success($file);
         } catch (Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::error($e->getMessage(), [
+              'BUCKET_ID' => $BUCKET_ID, 
+              'FILE_ID' => $FILE_ID
+            ]);
         }
     }
     
@@ -41,8 +44,29 @@ class StorageController extends Controller
 
             return ResponseHelper::success($result);
         } catch (Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::error($e->getMessage(), [
+              'BUCKET_ID' => $BUCKET_ID, 
+              'FILE_ID' => $FILE_ID
+            ]);
         }
+    }
+    
+    public function getFilePreview($BUCKET_ID, $FILE_ID)
+    {
+      $result = $storage->getFilePreview(
+        bucketId: $BUCKET_ID,
+        fileId: $FILE_ID
+      );
+      return ResponseHelper::success($result);
+    }
+    
+    public function getFileView($BUCKET_ID, $FILE_ID)
+    {
+      $result = $storage->getFileView(
+        bucketId: $BUCKET_ID,
+        fileId: $FILE_ID
+      );
+      return ResponseHelper::success($result);
     }
 
     public function uploadFile(Request $request, $BUCKET_ID): JsonResponse
@@ -75,7 +99,10 @@ class StorageController extends Controller
 
             return ResponseHelper::success($uploadedFile);
         } catch (Exception $e) {
-            return ResponseHelper::error($e->getMessage());
+            return ResponseHelper::error($e->getMessage(), [
+              'BUCKET_ID' => $BUCKET_ID,
+              'REQUEST' => $request
+            ]);
         }
     }
 }

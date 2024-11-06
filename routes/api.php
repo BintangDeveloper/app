@@ -31,6 +31,10 @@ Route::prefix('storage')
       '/{BUCKET_ID}/download/{FILE_ID}', 'getFileDownload'
     );
     
+    Route::get(
+      '/{BUCKET_ID}/view/{FILE_ID}', 'getFileView'
+    );
+    
     Route::post(
       '/{BUCKET_ID}/upload', 'uploadFile'
     );
