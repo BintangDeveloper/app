@@ -3,6 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+use App\Helpers\ResponseHelper;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,11 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-    $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e) {
-        if ($request->is('admin/*')) {
-            return true;
+    $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+        if ($request->is('api/*')) {
+            return ResponseHelper::error('Record not found.');
         }
- 
-        return $request->expectsJson();
       });
     })->create();
