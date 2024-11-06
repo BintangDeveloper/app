@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         // Set when to render as JSON
         $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e) {
-            return $request->is('api/*') || $request->expectsJson();
+            return $request->is('dash/*') || $request->expectsJson();
         });
 
         // Customize the JSON response format
