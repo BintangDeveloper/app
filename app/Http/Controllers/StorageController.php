@@ -57,7 +57,7 @@ class StorageController extends Controller
         }
     }
     
-    public function getFileView(string $bucketId, string $fileId): JsonResponse
+    public function getFileView(string $bucketId, string $fileId)
     {
         //try {
             $result = $this->storage->getFileView(bucketId: $bucketId, fileId: $fileId);
