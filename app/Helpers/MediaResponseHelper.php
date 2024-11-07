@@ -67,7 +67,7 @@ class MediaResponseHelper
         }
         
         if ($fileName === null) {
-          $fileName = "BintangDeveloper-" . hash('sha1', date("Y-m-d H:i:s"));
+          $fileName = "BintangDeveloper-" . hash('sha1', $content);
         }
 
         // Set headers for download
