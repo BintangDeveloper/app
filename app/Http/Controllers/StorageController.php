@@ -38,11 +38,11 @@ class StorageController extends Controller
         }
     }
     
-    public function getFileDownload(string $bucketId, string $fileId): JsonResponse
+    public function getFileDownload(string $bucketId, string $fileId): mixed
     {
         try {
             $result = $this->storage->getFileDownload(bucketId: $bucketId, fileId: $fileId);
-            return ResponseHelper::success($result);
+            return MediaResponseHelper::media($result);
         } catch (Exception $e) {
             return ResponseHelper::error("Failed to download file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
         }
