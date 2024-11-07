@@ -54,7 +54,7 @@ class MediaResponseHelper
      */
     public static function download(
         mixed $content,
-        string $fileName = 'downloaded_file',
+        string $fileName = null,
         string $mimeType = null,
         array $headers = []
     ): StreamedResponse|Response {
@@ -64,6 +64,10 @@ class MediaResponseHelper
             if ($mimeType === null) {
                 return self::error("Could not determine MIME type", 415, $headers);
             }
+        }
+        
+        if ($fileName === null) {
+          $fileName = "BintangDeveloper-" . hash('sha1', date("Y-m-d H:i:s"));
         }
 
         // Set headers for download
