@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AppwriteClient;
 use App\Helpers\ResponseHelper;
+use App\Helpers\MediaResponseHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Exception;
@@ -47,27 +48,26 @@ class StorageController extends Controller
         }
     }
     
-    public function getFilePreview(string $bucketId, string $fileId): JsonResponse
+    public function getFilePreview(string $bucketId, string $fileId): mixed
     {
         try {
             $result = $this->storage->getFilePreview(bucketId: $bucketId, fileId: $fileId);
-            return ResponseHelper::success($result);
+            return MediaResponseHelper::media($result);
         } catch (Exception $e) {
             return ResponseHelper::error("Failed to preview file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
         }
     }
     
-    public function getFileView(string $bucketId, string $fileId)
+    public function getFileView(string $bucketId, string $fileId): mixed
     {
-        //try {
+        try {
             $result = $this->storage->getFileView(bucketId: $bucketId, fileId: $fileId);
             
-            return $result;
-            //return ResponseHelper::success($result);
-            /*
+            return MediaResponseHelper::media($result);
+            
         } catch (Exception $e) {
             return ResponseHelper::error("Failed to view file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
-        }*/
+        }
     }
 
     public function uploadFile(Request $request, string $bucketId): JsonResponse
