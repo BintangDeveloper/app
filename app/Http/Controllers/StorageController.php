@@ -61,7 +61,9 @@ class StorageController extends Controller
     {
         //try {
             $result = $this->storage->getFileView(bucketId: $bucketId, fileId: $fileId);
-            return ResponseHelper::success($result);
+            
+            return $result;
+            //return ResponseHelper::success($result);
             /*
         } catch (Exception $e) {
             return ResponseHelper::error("Failed to view file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
