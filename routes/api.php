@@ -4,8 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Helpers\ResponseHelper;
-
 use App\Http\Controllers\StorageController;
+use App\Http\Middleware\JwtAuthMiddleware;
 
 Route::prefix('auth')->group(function () {
   
@@ -25,7 +25,7 @@ Route::prefix('storage')
     
     Route::get(
       '/{BUCKET_ID}/list', 'listFiles'
-    );
+    )->middleware(JwtAuthMiddleware::class);
     
     Route::get(
       '/{BUCKET_ID}/info/{FILE_ID}', 'getFileInfo'
