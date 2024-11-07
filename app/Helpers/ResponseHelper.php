@@ -131,6 +131,8 @@ class ResponseHelper
         $response = self::buildResponse($data, $meta, $isError);
         $jsonOptions = (self::$prettyPrint ? JSON_PRETTY_PRINT : 0) | JSON_UNESCAPED_UNICODE;
 
-        return response()->json($response, $code, [], $jsonOptions)->withHeaders($headers);
+        return response()->json($response, $code, [
+          'Content-Type'=>'application/json; charset=utf-8'
+        ], $jsonOptions)->withHeaders($headers);
     }
 }
