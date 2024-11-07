@@ -42,7 +42,8 @@ class StorageController extends Controller
     {
         try {
             $result = $this->storage->getFileDownload(bucketId: $bucketId, fileId: $fileId);
-            return MediaResponseHelper::media($result);
+            
+            return MediaResponseHelper::download ($result);
         } catch (Exception $e) {
             return ResponseHelper::error("Failed to download file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
         }

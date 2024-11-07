@@ -39,6 +39,10 @@ Route::prefix('storage')
       '/{BUCKET_ID}/view/{FILE_ID}', 'getFileView'
     );
     
+    Route::get(
+      '/{BUCKET_ID}/preview/{FILE_ID}', 'getFilePreview'
+    );
+    
     Route::post(
       '/{BUCKET_ID}/upload', 'uploadFile'
     );

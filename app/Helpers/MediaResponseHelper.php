@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Helpers\ResponseHelper;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use finfo;
@@ -36,6 +37,47 @@ class MediaResponseHelper
             return self::streamFile($content, $mimeType, $code, $headers);
         } elseif (is_string($content) || is_resource($content)) {
             return self::streamRawContent($content, $mimeType, $code, $headers);
+        }
+
+        // Invalid content type
+        return self::error("Invalid media content provided", 400, $headers);
+    }
+    
+    /**
+     * Force download a file or binary content with auto MIME type detection.
+     *
+     * @param mixed $content The media content, which can be a file path, a string, or a binary buffer.
+     * @param string|null $fileName Optional file name for the download.
+     * @param string|null $mimeType Optional MIME type. If null, it will be auto-detected.
+     * @param array $headers Optional additional HTTP headers.
+     * @return StreamedResponse|Response
+     */
+    public static function download(
+        mixed $content,
+        string $fileName = 'downloaded_file',
+        string $mimeType = null,
+        array $headers = []
+    ): StreamedResponse|Response {
+        // If MIME type is not provided, auto-detect it
+        if ($mimeType === null) {
+            $mimeType = self::detectMimeType($content);
+            if ($mimeType === null) {
+                return self::error("Could not determine MIME type", 415, $headers);
+            }
+        }
+
+        // Set headers for download
+        $headers = array_merge($headers, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
+
+        // If content is a file path, stream the file; otherwise, stream the raw content
+        if (is_string($content) && file_exists($content)) {
+            return self::streamFile($content, $mimeType, 200, $headers);
+        } elseif (is_string($content) || is_resource($content)) {
+            return self::streamRawContent($content, $mimeType, 200, $headers);
         }
 
         // Invalid content type
@@ -135,12 +177,6 @@ class MediaResponseHelper
             'Content-Type' => 'application/json; charset=utf-8'
         ]);
 
-        $errorResponse = [
-            'status' => 'error',
-            'message' => $message,
-            'timestamp' => date("Y-m-d H:i:s"),
-        ];
-
-        return response()->json($errorResponse, $code, $headers);
+        return ResponseHelper::error($message, [], 500, $headers);
     }
 }
