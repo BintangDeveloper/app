@@ -59,12 +59,13 @@ class StorageController extends Controller
     
     public function getFileView(string $bucketId, string $fileId): JsonResponse
     {
-        try {
+        //try {
             $result = $this->storage->getFileView(bucketId: $bucketId, fileId: $fileId);
             return ResponseHelper::success($result);
+            /*
         } catch (Exception $e) {
             return ResponseHelper::error("Failed to view file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
-        }
+        }*/
     }
 
     public function uploadFile(Request $request, string $bucketId): JsonResponse
