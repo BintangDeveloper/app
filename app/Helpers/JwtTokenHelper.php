@@ -2,6 +2,9 @@
 
 namespace App\Helpers;
 
+use Lcobucci\JWT\Validation\Constraint\IssuedBy;
+use Lcobucci\JWT\Validation\Constraint\ExpiresAt;
+
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
@@ -18,17 +21,21 @@ class JwtTokenHelper
      *
      * @return Configuration
      */
-    protected static function getJwtConfig(): Configuration
-    {
-        if (!self::$jwtConfig) {
-            self::$jwtConfig = Configuration::forSymmetricSigner(
-                new Sha256(),
-                InMemory::plainText(env('JWT_KEY', 'nokey'))
-            );
-        }
-        return self::$jwtConfig;
+     protected static function getJwtConfig(): Configuration
+     {
+       if (!self::$jwtConfig) {
+          self::$jwtConfig = Configuration::forSymmetricSigner(
+            new Sha256(),
+            InMemory::plainText(env('JWT_KEY', 'nokey'))
+          );
+          self::$jwtConfig->setValidationConstraints(
+            new IssuedBy(env('APP_URL', 'http://localhost')),
+            new ExpiresAt()
+          );
+       }
+       
+       return self::$jwtConfig;
     }
-
     /**
      * Generate a JWT token with custom claims and expiration.
      *
