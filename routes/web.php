@@ -14,7 +14,15 @@ Route::get('/', function (Request $request) {
 });
 
 Route::get('/_/gen', function (Request $request) {
-  return JwtTokenHelper::generateToken([
-    'permission' => 2
-  ], 86400);
+  JwtHelper::initialize(env('JWT_KEY', 'nokey'));
+  
+  return JwtHelper::createToken([
+    'sub' => 'BintangDeveloperServers', 
+    'permission' => 3,
+    
+    'iss' => 'https://www.bintangdeveloper.eu.org',
+    'aud' => 'https://www.bintangdeveloper.eu.org',
+    
+    'security' => base64_encode(random_bytes(16))
+  ]);
 });
