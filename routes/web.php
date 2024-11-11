@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
-use App\Helpers\JwtTokenHelper;
+use App\Helpers\JwtHelper;
 
 Route::get('/', function (Request $request) {
     return view('welcome');
