@@ -2,40 +2,30 @@
 
 namespace App\Helpers;
 
-use Lcobucci\JWT\Validation\Constraint\IssuedBy;
-use Lcobucci\JWT\Validation\Constraint\ExpiresAt;
-
-use Lcobucci\JWT\Configuration;
-use Lcobucci\JWT\Token\Plain;
+use DateTimeImmutable;
+use Lcobucci\JWT\JwtFacade;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
-use DateTimeImmutable;
-use Exception;
+use Lcobucci\JWT\Validation\Constraint;
+use Lcobucci\Clock\SystemClock;
 
 class JwtTokenHelper
 {
-    protected static $jwtConfig = null;
+    protected static $jwtFacade = null;
 
     /**
-     * Initialize the JWT configuration (static initializer).
+     * Initialize the JwtFacade and key.
      *
-     * @return Configuration
+     * @return JwtFacade
      */
-     protected static function getJwtConfig(): Configuration
-     {
-       if (!self::$jwtConfig) {
-          self::$jwtConfig = Configuration::forSymmetricSigner(
-            new Sha256(),
-            InMemory::plainText(env('JWT_KEY', 'nokey'))
-          );
-          self::$jwtConfig->setValidationConstraints(
-            new IssuedBy(env('APP_URL', 'http://localhost')),
-            new ExpiresAt()
-          );
-       }
-       
-       return self::$jwtConfig;
+    protected static function getJwtFacade(): JwtFacade
+    {
+        if (!self::$jwtFacade) {
+            self::$jwtFacade = new JwtFacade();
+        }
+        return self::$jwtFacade;
     }
+
     /**
      * Generate a JWT token with custom claims and expiration.
      *
@@ -46,20 +36,20 @@ class JwtTokenHelper
     public static function generateToken(array $claims, int $ttl = 3600): string
     {
         $now = new DateTimeImmutable();
-        $jwtConfig = self::getJwtConfig();
+        $key = InMemory::plainText(env('JWT_KEY', 'nokey'));
+        $jwtFacade = self::getJwtFacade();
 
-        $builder = $jwtConfig->builder()
-            ->issuedBy(env('APP_URL', 'http://localhost'))     // Issuer of the token
-            ->issuedAt($now)                       // Time of issuance
-            ->expiresAt($now->modify("+{$ttl} seconds")); // Expiration time
+        // Generate token with claims and expiration
+        $token = $jwtFacade->issue(
+            new Sha256(),
+            $key,
+            static fn ($builder, $issuedAt) => $builder
+                ->issuedBy(env('APP_URL', 'http://localhost'))
+                ->expiresAt($issuedAt->modify("+{$ttl} seconds"))
+                ->with(...array_map(static fn($k, $v) => [$k, $v], array_keys($claims), $claims))
+        );
 
-        // Add custom claims
-        foreach ($claims as $key => $value) {
-            $builder->withClaim($key, $value);
-        }
-
-        // Create the token and return it as a string
-        return $builder->getToken($jwtConfig->signer(), $jwtConfig->signingKey())->toString();
+        return $token->toString();
     }
 
     /**
@@ -71,23 +61,20 @@ class JwtTokenHelper
     public static function validateToken(string $token): ?array
     {
         try {
-            $jwtConfig = self::getJwtConfig();
+            $key = InMemory::plainText(env('JWT_KEY', 'nokey'));
+            $jwtFacade = self::getJwtFacade();
+            $clock = new SystemClock(new \DateTimeZone('UTC'));
 
-            // Parse the token
-            $parsedToken = $jwtConfig->parser()->parse($token);
+            // Parse and validate token
+            $parsedToken = $jwtFacade->parse(
+                $token,
+                new Constraint\SignedWith(new Sha256(), $key),
+                new Constraint\StrictValidAt($clock)
+            );
 
-            assert($parsedToken instanceof Plain);
-
-            // Validate the token signature and expiration
-            if (!$jwtConfig->validator()->validate($parsedToken, ...$jwtConfig->validationConstraints())) {
-                return null;
-            }
-
-            // Return the token claims as an array
+            // Return claims if valid
             return $parsedToken->claims()->all();
-
-        } catch (Exception $e) {
-            // Handle any parsing or validation exceptions
+        } catch (\Exception $e) {
             return null;
         }
     }
