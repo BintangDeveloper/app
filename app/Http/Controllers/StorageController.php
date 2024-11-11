@@ -18,6 +18,16 @@ class StorageController extends Controller
         $this->storage = AppwriteClient::getService('Storage');
     }
     
+    public function listBucket(): JsonResponse
+    {
+        try {
+            $result = $this->storage->listBucket();
+            return ResponseHelper::success($result);
+        } catch (Exception $e) {
+            return ResponseHelper::error("Failed to list files.", ['error' => $e->getMessage()]);
+        }
+    }
+    
     public function listFiles(string $bucketId): JsonResponse
     {
         try {

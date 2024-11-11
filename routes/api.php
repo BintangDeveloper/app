@@ -23,6 +23,11 @@ Route::prefix('storage')
   ->controller(StorageController::class)
   ->group(function () {
     
+    
+    Route::get(
+      '/list', 'listBucket'
+    )->middleware(JwtAuthMiddleware::class);
+    
     Route::get(
       '/{BUCKET_ID}/list', 'listFiles'
     )->middleware(JwtAuthMiddleware::class);

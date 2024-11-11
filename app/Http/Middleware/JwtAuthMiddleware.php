@@ -19,15 +19,22 @@ class JwtAuthMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        // Retrieve the Authorization header
+        // Retrieve the token from the Authorization header
         $authHeader = $request->header('Authorization');
+        $token = null;
 
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            return ResponseHelper::error('Token not provided.', [], Response::HTTP_UNAUTHORIZED);
+        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+            $token = substr($authHeader, 7); // Token from Authorization header
+        } elseif ($request->query('token')) {
+            $token = $request->query('token'); // Token from query parameter
+        } elseif ($request->cookie('token')) {
+            $token = $request->cookie('token'); // Token from cookie
         }
 
-        // Extract the token from the header
-        $token = substr($authHeader, 7);
+        // If no token was found, return an error response
+        if (!$token) {
+            return ResponseHelper::error('Token not provided.', [], Response::HTTP_UNAUTHORIZED);
+        }
 
         // Validate the token using JwtTokenHelper
         $claims = JwtTokenHelper::validateToken($token);
