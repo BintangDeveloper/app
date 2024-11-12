@@ -51,7 +51,7 @@ class JwtAuthMiddleware
         }
 
         // Validate the token's subject (sub) claim, adjust 'expected-subject' to your actual subject requirement
-        $expectedSubject = 'BintangDeveloperServers';  // replace this with your actual subject value
+        $expectedSubject = hash('sha1', env('APP_NAME', 'APP'));  // replace this with your actual subject value
         if (!JwtHelper::validateToken($parsedToken, $expectedSubject)) {
             return ResponseHelper::error('Invalid or expired token.', [], Response::HTTP_UNAUTHORIZED);
         }
