@@ -8,8 +8,6 @@ use App\Helpers\JwtHelper;
 use App\Helpers\ResponseHelper;
 use Symfony\Component\HttpFoundation\Response;
 
-use Barryvdh\Debugbar\Facades\Debugbar as DebugBar;
-
 class JwtAuthMiddleware
 {
     /**
@@ -40,13 +38,10 @@ class JwtAuthMiddleware
         if (!$token) {
             return ResponseHelper::error('Token not provided.', [], Response::HTTP_UNAUTHORIZED);
         }
-        
-        DebugBar::info($token);
 
         // Parse the token
         $parsedToken = JwtHelper::parseToken($token);
         if (!$parsedToken) {
-            DebugBar::info($parsedToken);
             return ResponseHelper::error('Invalid token format.', [], Response::HTTP_UNAUTHORIZED);
         }
 
