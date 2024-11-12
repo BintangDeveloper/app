@@ -127,7 +127,7 @@ class ResponseHelper
         int $code, 
         array $headers, 
         bool $isError = false
-    ): JsonResponse {
+    ): jsonresponse {
         $response = self::buildResponse($data, $meta, $isError);
         $jsonOptions = (self::$prettyPrint ? JSON_PRETTY_PRINT : 0) | JSON_UNESCAPED_UNICODE;
 

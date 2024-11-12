@@ -21,7 +21,7 @@ class StorageController extends Controller
     public function listBucket(): JsonResponse
     {
         try {
-            $result = $this->storage->listBucket();
+            $result = $this->storage->listBuckets();
             return ResponseHelper::success($result);
         } catch (Exception $e) {
             return ResponseHelper::error("Failed to list files.", ['error' => $e->getMessage()]);
