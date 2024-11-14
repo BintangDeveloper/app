@@ -3,9 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Helpers\ResponseHelper;
+use App\Helpers\Response\JsonResponseHelper;
 use App\Http\Controllers\StorageController;
-use App\Http\Middleware\JwtAuthMiddleware;
+use App\Http\Middleware\ApiAuthMiddleware;
 
 Route::prefix('auth')->group(function () {
   
@@ -26,11 +26,11 @@ Route::prefix('storage')
     
     Route::get(
       '/list', 'listBucket'
-    )->middleware(JwtAuthMiddleware::class);
+    )->middleware(ApiAuthMiddleware::class);
     
     Route::get(
       '/{BUCKET_ID}/list', 'listFiles'
-    )->middleware(JwtAuthMiddleware::class);
+    )->middleware(ApiAuthMiddleware::class);
     
     Route::get(
       '/{BUCKET_ID}/info/{FILE_ID}', 'getFileInfo'
@@ -56,7 +56,7 @@ Route::prefix('storage')
 Route::prefix('test')->group(function () {
   
   Route::get('/ping', function (Request $request) {
-    return ResponseHelper::success("Hello World!");
+    return JsonResponseHelper::success("Hello World!");
   });
   
 });

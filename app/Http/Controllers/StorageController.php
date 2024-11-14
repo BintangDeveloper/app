@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\AppwriteClient;
-use App\Helpers\ResponseHelper;
-use App\Helpers\MediaResponseHelper;
+use App\Helpers\Response\JsonResponseHelper;
+use App\Helpers\Response\MediaResponseHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Exception;
@@ -22,9 +22,9 @@ class StorageController extends Controller
     {
         try {
             $result = $this->storage->listBuckets();
-            return ResponseHelper::success($result);
+            return JsonResponseHelper::success($result);
         } catch (Exception $e) {
-            return ResponseHelper::error("Failed to list files.", ['error' => $e->getMessage()]);
+            return JsonResponseHelper::error("Failed to list files.", ['error' => $e->getMessage()]);
         }
     }
     
@@ -32,9 +32,9 @@ class StorageController extends Controller
     {
         try {
             $result = $this->storage->listFiles(bucketId: $bucketId);
-            return ResponseHelper::success($result);
+            return JsonResponseHelper::success($result);
         } catch (Exception $e) {
-            return ResponseHelper::error("Failed to list files.", ['bucketId' => $bucketId, 'error' => $e->getMessage()]);
+            return JsonResponseHelper::error("Failed to list files.", ['bucketId' => $bucketId, 'error' => $e->getMessage()]);
         }
     }
 
@@ -42,9 +42,9 @@ class StorageController extends Controller
     {
         try {
             $file = $this->storage->getFile(bucketId: $bucketId, fileId: $fileId);
-            return ResponseHelper::success($file);
+            return JsonResponseHelper::success($file);
         } catch (Exception $e) {
-            return ResponseHelper::error("File not found.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
+            return JsonResponseHelper::error("File not found.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
         }
     }
     
@@ -55,7 +55,7 @@ class StorageController extends Controller
             
             return MediaResponseHelper::download ($result);
         } catch (Exception $e) {
-            return ResponseHelper::error("Failed to download file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
+            return JsonResponseHelper::error("Failed to download file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
         }
     }
     
@@ -65,7 +65,7 @@ class StorageController extends Controller
             $result = $this->storage->getFilePreview(bucketId: $bucketId, fileId: $fileId);
             return MediaResponseHelper::media($result);
         } catch (Exception $e) {
-            return ResponseHelper::error("Failed to preview file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
+            return JsonResponseHelper::error("Failed to preview file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
         }
     }
     
@@ -77,7 +77,7 @@ class StorageController extends Controller
             return MediaResponseHelper::media($result);
             
         } catch (Exception $e) {
-            return ResponseHelper::error("Failed to view file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
+            return JsonResponseHelper::error("Failed to view file.", ['bucketId' => $bucketId, 'fileId' => $fileId, 'error' => $e->getMessage()]);
         }
     }
 
@@ -100,9 +100,9 @@ class StorageController extends Controller
                 permissions: ['read("any")']
             );
 
-            return ResponseHelper::success($uploadedFile);
+            return JsonResponseHelper::success($uploadedFile);
         } catch (Exception $e) {
-            return ResponseHelper::error("File upload failed.", ['bucketId' => $bucketId, 'error' => $e->getMessage()]);
+            return JsonResponseHelper::error("File upload failed.", ['bucketId' => $bucketId, 'error' => $e->getMessage()]);
         }
     }
 

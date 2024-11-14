@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Helpers;
+namespace App\Helpers\Response;
 
 use Illuminate\Http\JsonResponse;
 
-class ResponseHelper
+class JsonResponseHelper
 {
     /**
      * Enable JSON pretty print.
