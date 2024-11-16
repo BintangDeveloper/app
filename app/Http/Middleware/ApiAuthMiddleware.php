@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Helpers\Response\JsonResponseHelper;
 use Symfony\Component\HttpFoundation\Response;
-use App\RsaKeyHandler;
+use App\Helpers\RsaKeyHandler;
 
 class ApiAuthMiddleware
 {

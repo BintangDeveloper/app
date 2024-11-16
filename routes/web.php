@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
-use App\RsaKeyHandler;
+use App\Helpers\RsaKeyHandler;
 
 Route::get('/', function (Request $request) {
     return view('welcome');
