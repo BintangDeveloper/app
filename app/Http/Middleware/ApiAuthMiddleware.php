@@ -22,13 +22,13 @@ class ApiAuthMiddleware
         $token = $this->extractToken($request);
 
         if (!$token) {
-            return JsonResponseHelper::error('Token is not set.', Response::HTTP_UNAUTHORIZED);
+            return JsonResponseHelper::error('Token is not set.', [], Response::HTTP_UNAUTHORIZED);
         }
 
         $rsa = new RsaKeyHandler(env('PRIVATE_KEY'));
 
         if (!$rsa->validateKeyPair($token)) {
-            return JsonResponseHelper::error('Invalid token.', Response::HTTP_FORBIDDEN);
+            return JsonResponseHelper::error('Invalid token.', [ $token ], Response::HTTP_FORBIDDEN);
         }
 
         $request->attributes->set('claims', $token);
