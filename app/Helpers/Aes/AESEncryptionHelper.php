@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers\Encryption;
+namespace App\Helpers\Aes;
 
 class AESEncryptionHelper
 {
@@ -67,7 +67,7 @@ class AESEncryptionHelper
 
         $decrypted = openssl_decrypt($encrypted, $this->cipher, $this->key, OPENSSL_RAW_DATA, $iv);
         if ($decrypted === false) {
-            throw new RuntimeException('Decryption failed.');
+            throw new \RuntimeException('Decryption failed.');
         }
 
         return $decrypted;

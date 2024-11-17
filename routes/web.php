@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
-use App\Helpers\RsaKeyHandler;
+use App\Helpers\Rsa\RSAKeyManager;
+use App\Helpers\Aes\AESEncryptionHelper;
 
 Route::get('/', function (Request $request) {
     return view('welcome');
@@ -14,7 +15,12 @@ Route::get('/', function (Request $request) {
 });
 
 Route::get('/_/gen', function (Request $request) {
-  $rsa = new RsaKeyHandler(env('PRIVATE_KEY'));
+  $aes = new AESEncryptionHelper(env('RSA_PASSPHRASE', null));
   
-  return $rsa->generatePublicKey;
+  $rsa = new RSAKeyManager(
+    base64_decode(env('RSA_PRIVATE_KEY')), 
+    env('RSA_PASSPHRASE', null)
+  );
+  
+  return base64_encode($aes->encrypt($rsa->generatePublicKey()));
 });

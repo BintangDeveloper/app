@@ -2,29 +2,54 @@
 
 namespace App\Helpers;
 
+use InvalidArgumentException;
+use RuntimeException;
+
 class RsaKeyHandler
 {
     private string $privateKey;
     private string $algorithm;
+    private bool $isBase64;
 
     /**
      * Constructor to initialize the class with dependencies.
      *
      * @param string $privateKey PEM-formatted private key.
-     * @param array $config Configuration options (e.g., algorithm).
+     * @param array $config Configuration options (e.g., 'algorithm' and 'isBase64').
      * @throws InvalidArgumentException
      */
     public function __construct(string $privateKey, array $config = [])
     {
         $this->algorithm = $config['algorithm'] ?? OPENSSL_ALGO_SHA256;
+        $this->isBase64 = $config['isBase64'] ?? false;
 
-        $privateKey = $this->ensureKeyFormat($privateKey, "PRIVATE");
+        $processedKey = $this->isBase64
+            ? $this->autocorrectPrivateKey($privateKey)
+            : $this->ensureKeyFormat($privateKey, "PRIVATE");
+            
+        file_put_contents('gg.pem', $processedKey);
 
-        if (!$this->isValidPrivateKey($privateKey)) {
+        if (!$this->isValidPrivateKey($processedKey)) {
+            \Barryvdh\Debugbar\Facades\Debugbar::info($processedKey);
             throw new InvalidArgumentException("Invalid private key.");
         }
 
-        $this->privateKey = $privateKey;
+        $this->privateKey = $processedKey;
+    }
+
+    /**
+     * Auto-corrects a Base64-encoded private key to valid PEM format.
+     *
+     * @param string $key Base64-encoded private key.
+     * @return string PEM-formatted private key.
+     * addPemHeaders
+     */
+    private function autocorrectPrivateKey(string $key): string
+    {
+        $key = str_replace(["\n", "\r", " "], "", preg_replace('/-----BEGIN (.*?)-----|-----END (.*?)-----/', '', $key));
+        return $this->addPemHeaders(
+            wordwrap($key, 64, "\n", true)
+        , 'PRIVATE');
     }
 
     /**
@@ -33,33 +58,40 @@ class RsaKeyHandler
      * @param string $key The key string.
      * @param string $type Type of the key: "PRIVATE" or "PUBLIC".
      * @return string Properly formatted key.
+     * @throws InvalidArgumentException
      */
     private function ensureKeyFormat(string $key, string $type): string
     {
+        $key = preg_replace('/-----.*?-----/', PHP_EOL, trim($key)); // Remove existing headers/footers
+        return $this->addPemHeaders(chunk_split($key, 64, "\n"), $type);
+    }
+
+    /**
+     * Adds the appropriate PEM headers and footers to a key.
+     *
+     * @param string $key Key content without headers/footers.
+     * @param string $type Type of the key: "PRIVATE" or "PUBLIC".
+     * @return string PEM-formatted key.
+     * @throws InvalidArgumentException
+     */
+    private function addPemHeaders(string $key, string $type): string
+    {
         $headers = [
             "PRIVATE" => [
-                "header" => "-----BEGIN RSA PRIVATE KEY-----",
-                "footer" => "-----END RSA PRIVATE KEY-----"
+                "header" => "-----BEGIN ENCRYPTED PRIVATE KEY-----",
+                "footer" => "-----END ENCRYPTED PRIVATE KEY-----",
             ],
             "PUBLIC" => [
                 "header" => "-----BEGIN PUBLIC KEY-----",
-                "footer" => "-----END PUBLIC KEY-----"
-            ]
+                "footer" => "-----END PUBLIC KEY-----",
+            ],
         ];
 
         if (!isset($headers[$type])) {
             throw new InvalidArgumentException("Invalid key type specified.");
         }
 
-        $header = $headers[$type]['header'];
-        $footer = $headers[$type]['footer'];
-
-        // Remove any existing headers/footers
-        $key = preg_replace('/-----.*?-----/', '', $key);
-        $key = trim($key);
-
-        // Re-add proper header and footer
-        return $header . "\n" . chunk_split($key, 64, "\n") . $footer . "\n";
+        return "{$headers[$type]['header']}\n$key{$headers[$type]['footer']}\n";
     }
 
     /**
@@ -70,7 +102,10 @@ class RsaKeyHandler
      */
     private function isValidPrivateKey(string $key): bool
     {
-        return openssl_pkey_get_private($key) !== false;
+        $process = openssl_pkey_get_private($key) !== false;
+        
+        \Barryvdh\Debugbar\Facades\Debugbar::info($process . openssl_error_string());
+        return $process;
     }
 
     /**
@@ -81,7 +116,7 @@ class RsaKeyHandler
      */
     private function isValidPublicKey(string $key): bool
     {
-        return openssl_pkey_get_public($key) !== false;
+        return openssl_pkey_get_public($key, '@BINTANG0') !== false;
     }
 
     /**
@@ -94,14 +129,14 @@ class RsaKeyHandler
     {
         $privateKeyResource = openssl_pkey_get_private($this->privateKey);
 
-        if ($privateKeyResource === false) {
+        if (!$privateKeyResource) {
             throw new RuntimeException("Failed to process the private key.");
         }
 
         $keyDetails = openssl_pkey_get_details($privateKeyResource);
         openssl_free_key($privateKeyResource);
 
-        if ($keyDetails === false || !isset($keyDetails['key'])) {
+        if (!$keyDetails || !isset($keyDetails['key'])) {
             throw new RuntimeException("Failed to extract public key.");
         }
 
@@ -117,13 +152,13 @@ class RsaKeyHandler
      */
     public function validateAndCorrectPublicKey(string $publicKey): string
     {
-        $publicKey = $this->ensureKeyFormat($publicKey, "PUBLIC");
+        $correctedKey = $this->ensureKeyFormat($publicKey, "PUBLIC");
 
-        if (!$this->isValidPublicKey($publicKey)) {
+        if (!$this->isValidPublicKey($correctedKey)) {
             throw new InvalidArgumentException("Invalid public key.");
         }
 
-        return $publicKey;
+        return $correctedKey;
     }
 
     /**
@@ -135,23 +170,22 @@ class RsaKeyHandler
     public function validateKeyPair(string $publicKey): bool
     {
         $publicKey = $this->validateAndCorrectPublicKey($publicKey);
-
         $data = "test-data";
-        $signature = '';
 
-        // Sign the data with the private key
         $privateKeyResource = openssl_pkey_get_private($this->privateKey);
-        if ($privateKeyResource === false) {
+        if (!$privateKeyResource) {
             return false;
         }
+
+        $signature = '';
         openssl_sign($data, $signature, $privateKeyResource, $this->algorithm);
         openssl_free_key($privateKeyResource);
 
-        // Verify the signature with the public key
         $publicKeyResource = openssl_pkey_get_public($publicKey);
-        if ($publicKeyResource === false) {
+        if (!$publicKeyResource) {
             return false;
         }
+
         $isValid = openssl_verify($data, $signature, $publicKeyResource, $this->algorithm) === 1;
         openssl_free_key($publicKeyResource);
 
