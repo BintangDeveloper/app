@@ -2,59 +2,58 @@
 
 namespace App\Helpers\Aes;
 
+use phpseclib3\Crypt\AES;
+use phpseclib3\Exception\BadDecryptionException;
+use InvalidArgumentException;
+use RuntimeException;
+
 class AESEncryptionHelper
 {
+    private AES $aes;
+    private bool $useBase64;
     private string $key;
     private string $cipher;
-    private int $ivLength;
-    private bool $useBase64;
 
     /**
      * Constructor for dependency injection.
      *
      * @param string $key The encryption key
-     * @param string $cipher AES cipher method (default: 'aes-256-cbc')
-     * @param bool $useBase64 Whether to base64 encode the encrypted output (default: true)
+     * @param string $cipher AES cipher method ('aes-128-cbc', 'aes-192-cbc', 'aes-256-cbc')
+     * @param bool $useBase64 Whether to base64 encode the encrypted output
      */
     public function __construct(string $key, string $cipher = 'aes-256-cbc', bool $useBase64 = true)
     {
-        if (!in_array($cipher, openssl_get_cipher_methods())) {
-            throw new InvalidArgumentException("Invalid cipher method: $cipher");
-        }
-        
-        $this->key = hash('sha256', $key, true); // Ensures 256-bit key length
-        $this->cipher = $cipher;
-        $this->ivLength = openssl_cipher_iv_length($cipher);
+        $this->configureCipher($cipher);
         $this->useBase64 = $useBase64;
+        $this->setKey($key);
     }
 
     /**
      * Encrypts the provided data.
      *
      * @param string $data The plaintext data to encrypt
-     * @return string Encrypted data (with IV prepended and optionally base64 encoded)
-     * @throws Exception if encryption fails
+     * @return string Encrypted data (IV prepended and optionally base64 encoded)
      */
     public function encrypt(string $data): string
     {
-        $iv = openssl_random_pseudo_bytes($this->ivLength);
+        $iv = random_bytes($this->aes->getBlockLength() >> 3);
+        $this->aes->setIV($iv);
 
-        $encrypted = openssl_encrypt($data, $this->cipher, $this->key, OPENSSL_RAW_DATA, $iv);
+        $encrypted = $this->aes->encrypt($data);
         if ($encrypted === false) {
             throw new RuntimeException('Encryption failed.');
         }
 
-        $encryptedData = $iv . $encrypted; // Prepend IV for decryption
+        $result = $iv . $encrypted;
 
-        return $this->useBase64 ? base64_encode($encryptedData) : $encryptedData;
+        return $this->useBase64 ? base64_encode($result) : $result;
     }
 
     /**
      * Decrypts the provided encrypted data.
      *
-     * @param string $data The encrypted data (with prepended IV and optionally base64 encoded)
+     * @param string $data The encrypted data (IV prepended and optionally base64 encoded)
      * @return string Decrypted plaintext data
-     * @throws Exception if decryption fails
      */
     public function decrypt(string $data): string
     {
@@ -62,53 +61,79 @@ class AESEncryptionHelper
             $data = base64_decode($data);
         }
 
-        $iv = substr($data, 0, $this->ivLength);
-        $encrypted = substr($data, $this->ivLength);
+        $ivLength = $this->aes->getBlockLength() >> 3;
+        $iv = substr($data, 0, $ivLength);
+        $encrypted = substr($data, $ivLength);
 
-        $decrypted = openssl_decrypt($encrypted, $this->cipher, $this->key, OPENSSL_RAW_DATA, $iv);
-        if ($decrypted === false) {
-            throw new \RuntimeException('Decryption failed.');
+        $this->aes->setIV($iv);
+
+        try {
+            return $this->aes->decrypt($encrypted);
+        } catch (BadDecryptionException $e) {
+            throw new RuntimeException('Decryption failed: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * Configures the AES cipher method.
+     *
+     * @param string $cipher The AES cipher method ('aes-128-cbc', 'aes-192-cbc', 'aes-256-cbc')
+     */
+    private function configureCipher(string $cipher): void
+    {
+        $supportedCiphers = ['aes-128-cbc', 'aes-192-cbc', 'aes-256-cbc'];
+        if (!in_array($cipher, $supportedCiphers)) {
+            throw new InvalidArgumentException("Invalid cipher method: $cipher");
         }
 
-        return $decrypted;
+        $this->cipher = $cipher;
+        $this->aes = new AES('cbc'); // Only CBC mode is supported in phpseclib
     }
 
     /**
      * Sets the encryption key.
      *
      * @param string $key The new encryption key
-     * @return void
      */
     public function setKey(string $key): void
     {
-        $this->key = hash('sha256', $key, true);
+        $keyLength = match ($this->cipher) {
+            'aes-128-cbc' => 16,
+            'aes-192-cbc' => 24,
+            'aes-256-cbc' => 32,
+        };
+
+        $this->key = substr(hash('sha256', $key, true), 0, $keyLength);
+        $this->aes->setKey($this->key);
     }
 
     /**
-     * Sets the AES cipher method.
-     *
-     * @param string $cipher The AES cipher method (e.g., 'aes-128-cbc', 'aes-256-cbc')
-     * @return void
-     * @throws InvalidArgumentException for unsupported ciphers
-     */
-    public function setCipher(string $cipher): void
-    {
-        if (!in_array($cipher, openssl_get_cipher_methods())) {
-            throw new InvalidArgumentException("Invalid cipher method: $cipher");
-        }
-        $this->cipher = $cipher;
-        $this->ivLength = openssl_cipher_iv_length($cipher);
-    }
-
-    /**
-     * Toggles base64 encoding for encrypted output.
+     * Enables or disables base64 encoding for encrypted output.
      *
      * @param bool $useBase64 Whether to use base64 encoding
-     * @return void
      */
-    public function setBase64Encoding(bool $useBase64): void
+    public function useBase64Encoding(bool $useBase64): void
     {
         $this->useBase64 = $useBase64;
     }
-}
 
+    /**
+     * Retrieves the current encryption key (for testing purposes).
+     *
+     * @return string
+     */
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    /**
+     * Retrieves the current AES cipher method (for testing purposes).
+     *
+     * @return string
+     */
+    public function getCipher(): string
+    {
+        return $this->cipher;
+    }
+}

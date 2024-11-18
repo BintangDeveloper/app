@@ -3,9 +3,14 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Helpers\Rsa\RSAKeyManager;
+use App\Helpers\Aes\AESEncryptionHelper;
+
 use App\Helpers\Response\JsonResponseHelper;
 use App\Http\Controllers\StorageController;
 use App\Http\Middleware\ApiAuthMiddleware;
+
+use Illuminate\Support\Facades\Http;
 
 Route::prefix('auth')->group(function () {
   
@@ -59,4 +64,27 @@ Route::prefix('test')->group(function () {
     return JsonResponseHelper::success("Hello World!");
   });
   
+});
+
+Route::prefix('_')->group(function () {
+  Route::get('/api-token', function (Request $request) {
+      $aes = new AESEncryptionHelper(env('RSA_PASSPHRASE', null));
+  
+      $rsa = new RSAKeyManager(
+        base64_decode(env('RSA_PRIVATE_KEY')), 
+        env('RSA_PASSPHRASE', null)
+      );
+  
+      return JsonResponseHelper::success(base64_encode($aes->encrypt($rsa->generatePublicKey())));
+  });
+  
+  Route::get('/csrf-token', function(Request $request) {
+    
+      $token = session()->token(); // Alternatively: csrf_token()
+      if (!$token) {
+        session()->start(); // Start the session if not started
+        $token = csrf_token(); // Re-generate the token
+      }
+      return JsonResponseHelper::success($token);
+  });
 });
