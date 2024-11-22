@@ -6,6 +6,7 @@ use App\Models\GoogleUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 
 class GoogleOAuthController extends Controller
@@ -88,6 +89,8 @@ class GoogleOAuthController extends Controller
 
         // Generate a Passport token for the user
         $token = $user->createToken('Personal Access Token')->accessToken;
+        
+        Cookie::queue(Cookie::make('security', $token, 4320));
 
         return response()->json([
             'message' => 'Successfully authenticated',
