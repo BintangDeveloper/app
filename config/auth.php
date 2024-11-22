@@ -40,7 +40,17 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api' => [
+            'driver' => 'passport',
+            'provider' => 'users',
+         ],
+        'google' => [
+            'driver' => 'passport',
+            'provider' => 'google_users',
+        ],
     ],
+    
+
 
     /*
     |--------------------------------------------------------------------------
@@ -69,6 +79,11 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+        
+        'google_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\GoogleUser::class,
+         ],
     ],
 
     /*
